@@ -1,4 +1,4 @@
-from ninja import ModelSchema
+from ninja import ModelSchema, Schema
 from .models import Category, Blog
 
 class CategorySchema(ModelSchema):
@@ -13,3 +13,11 @@ class BlogSchema(ModelSchema):
     class Meta:
         model = Blog
         fields = ('id', 'name', 'slug', 'category', 'description')
+
+
+class Error(Schema):
+    message: str
+        
+    
+class CategoryCreateSchema(Schema):
+    name: str
