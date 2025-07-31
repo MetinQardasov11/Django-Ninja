@@ -9,6 +9,8 @@ from .schemas import (
     BlogCategoryPatch
 )
 from django.shortcuts import get_object_or_404
+from ninja.pagination import paginate, PageNumberPagination
+from django.db.models import Q
 
 api = NinjaAPI()
 
@@ -117,3 +119,22 @@ def delete_blog(request, slug: str):
     
     blog.delete()
     return blog
+
+
+@api.get('/blogs/paginated', response=list[BlogSchema])
+@paginate(PageNumberPagination, page_size=10)
+def paginated_blogs(request):
+    return Blog.objects.select_related("category").all()
+
+
+
+
+@api.get("/blogs/search", response=list[BlogSchema])
+def search_blogs(request, q: str):
+    return Blog.objects.filter(Q(name__icontains=q) | Q(description__icontains=q))
+
+
+
+@api.get("/blogs/order", response=list[BlogSchema])
+def order_blogs(request, order_by: str = "name"):
+    return Blog.objects.all().order_by(order_by)
